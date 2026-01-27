@@ -1,0 +1,58 @@
+package org.jboss.pnc.quarkus.client.auth.runtime;
+
+import io.quarkus.logging.Log;
+import io.quarkus.oidc.client.Tokens;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
+
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Base64;
+
+/**
+ * Easily select the client authentication type (LDAP, OIDC [default]) that will be used to send authenticated requests
+ * to other applications.
+ *
+ * If OIDC is used, the user will have to specify the quarkus-oidc-client fields. If LDAP is used, the uer will have to
+ * specify the client_auth.ldap_credentials.path
+ */
+@ApplicationScoped
+public class ClientAuthentication {
+    public static enum ClientAuthType {
+        OIDC, LDAP
+    }
+
+    @Inject
+    Tokens tokens;
+
+    @ConfigProperty(name = "client_auth.type", defaultValue = "OIDC")
+    ClientAuthType clientAuthType;
+
+    /**
+     * The path must be a file with format: username:password
+     */
+    @ConfigProperty(name = "client_auth.ldap_credentials.path")
+    String ldapCredentialsPath;
+
+    public String getAuthToken() {
+        try {
+            Log.debugf("client-auth-method is: %s", clientAuthType);
+            return switch (clientAuthType) {
+                case OIDC -> tokens.getAccessToken();
+                case LDAP -> Base64.getEncoder().encodeToString(Files.readString(Path.of(ldapCredentialsPath)).strip().getBytes(StandardCharsets.UTF_8));
+            };
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public String getHttpAuthorizationHeaderValue() {
+        return switch (clientAuthType) {
+            case OIDC -> "Bearer " + getAuthToken();
+            case LDAP -> "Basic " + getAuthToken();
+        };
+    }
+}
