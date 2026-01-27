@@ -10,6 +10,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Base64;
+import java.util.Optional;
 
 /**
  * Easily select the client authentication type (LDAP, OIDC [default]) that will be used to send authenticated requests
@@ -33,8 +34,8 @@ public class PNCClientAuthImpl implements PNCClientAuth {
     /**
      * The path must be a file with format: username:password
      */
-    @ConfigProperty(name = "client_auth.ldap_credentials.path", defaultValue = "")
-    String ldapCredentialsPath;
+    @ConfigProperty(name = "client_auth.ldap_credentials.path")
+    Optional<String> ldapCredentialsPath;
 
     @Override
     public String getAuthToken() {
@@ -42,10 +43,10 @@ public class PNCClientAuthImpl implements PNCClientAuth {
             return switch (clientAuthType) {
                 case OIDC -> tokens.getAccessToken();
                 case LDAP -> {
-                    if (ldapCredentialsPath.isBlank()) {
+                    if (ldapCredentialsPath.isEmpty()) {
                         throw new RuntimeException("client_auth.ldap_credentials.path is empty!");
                     }
-                    yield Base64.getEncoder().encodeToString(Files.readString(Path.of(ldapCredentialsPath)).strip().getBytes(StandardCharsets.UTF_8));
+                    yield Base64.getEncoder().encodeToString(Files.readString(Path.of(ldapCredentialsPath.get())).strip().getBytes(StandardCharsets.UTF_8));
                 }
             };
         } catch (IOException e) {
