@@ -1,6 +1,5 @@
 package org.jboss.pnc.quarkus.client.auth.runtime;
 
-import io.quarkus.logging.Log;
 import io.quarkus.oidc.client.Tokens;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -39,7 +38,6 @@ public class ClientAuthentication {
 
     public String getAuthToken() {
         try {
-            Log.debugf("client-auth-method is: %s", clientAuthType);
             return switch (clientAuthType) {
                 case OIDC -> tokens.getAccessToken();
                 case LDAP -> Base64.getEncoder().encodeToString(Files.readString(Path.of(ldapCredentialsPath)).strip().getBytes(StandardCharsets.UTF_8));
