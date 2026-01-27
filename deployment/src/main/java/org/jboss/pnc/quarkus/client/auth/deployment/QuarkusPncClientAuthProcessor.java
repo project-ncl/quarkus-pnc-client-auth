@@ -1,9 +1,9 @@
 package org.jboss.pnc.quarkus.client.auth.deployment;
 
-import io.quarkus.arc.deployment.AdditionalBeanBuildItem;
+import io.quarkus.deployment.annotations.BuildProducer;
 import io.quarkus.deployment.annotations.BuildStep;
 import io.quarkus.deployment.builditem.FeatureBuildItem;
-import org.jboss.pnc.quarkus.client.auth.runtime.PNCClientAuth;
+import io.quarkus.deployment.builditem.nativeimage.ReflectiveClassBuildItem;
 
 class QuarkusPncClientAuthProcessor {
 
@@ -15,8 +15,15 @@ class QuarkusPncClientAuthProcessor {
     }
 
     @BuildStep
-    AdditionalBeanBuildItem registerMyBean() {
-        // Force Quarkus to recognize a class as a CDI bean without needing beans.xml
-        return new AdditionalBeanBuildItem(PNCClientAuth.class);
+    void registerReflection(BuildProducer<ReflectiveClassBuildItem> reflectiveClass) {
+        // Register both interface and implementation
+        reflectiveClass.produce(
+                ReflectiveClassBuildItem
+                        .builder(
+                                org.jboss.pnc.quarkus.client.auth.runtime.PNCClientAuth.class.getCanonicalName(),
+                                org.jboss.pnc.quarkus.client.auth.runtime.PNCClientAuthImpl.class.getCanonicalName())
+                        .methods(true)
+                        .fields(true)
+                        .build());
     }
 }
