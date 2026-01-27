@@ -1,9 +1,11 @@
 package org.jboss.pnc.quarkus.client.auth.deployment;
 
-import io.quarkus.deployment.annotations.BuildProducer;
+import io.quarkus.arc.deployment.AdditionalBeanBuildItem;
+import io.quarkus.arc.processor.DotNames;
 import io.quarkus.deployment.annotations.BuildStep;
 import io.quarkus.deployment.builditem.FeatureBuildItem;
-import io.quarkus.deployment.builditem.nativeimage.ReflectiveClassBuildItem;
+import org.jboss.pnc.quarkus.client.auth.runtime.PNCClientAuth;
+import org.jboss.pnc.quarkus.client.auth.runtime.PNCClientAuthImpl;
 
 class QuarkusPncClientAuthProcessor {
 
@@ -15,15 +17,11 @@ class QuarkusPncClientAuthProcessor {
     }
 
     @BuildStep
-    void registerReflection(BuildProducer<ReflectiveClassBuildItem> reflectiveClass) {
-        // Register both interface and implementation
-        reflectiveClass.produce(
-                ReflectiveClassBuildItem
-                        .builder(
-                                org.jboss.pnc.quarkus.client.auth.runtime.PNCClientAuth.class.getCanonicalName(),
-                                org.jboss.pnc.quarkus.client.auth.runtime.PNCClientAuthImpl.class.getCanonicalName())
-                        .methods(true)
-                        .fields(true)
-                        .build());
+    AdditionalBeanBuildItem registerServiceBean() {
+        // This tells Quarkus to index and manage these classes as CDI beans
+        return AdditionalBeanBuildItem.builder()
+                .addBeanClasses(PNCClientAuth.class, PNCClientAuthImpl.class)
+                .setDefaultScope(DotNames.APPLICATION_SCOPED) // Optional: enforce scope
+                .build();
     }
 }
