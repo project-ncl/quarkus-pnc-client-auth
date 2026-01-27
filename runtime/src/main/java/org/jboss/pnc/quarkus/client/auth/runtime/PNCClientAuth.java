@@ -19,7 +19,7 @@ import java.util.Base64;
  * specify the client_auth.ldap_credentials.path
  */
 @ApplicationScoped
-public class ClientAuthentication {
+public class PNCClientAuth {
     public static enum ClientAuthType {
         OIDC, LDAP
     }
@@ -36,6 +36,10 @@ public class ClientAuthentication {
     @ConfigProperty(name = "client_auth.ldap_credentials.path")
     String ldapCredentialsPath;
 
+    /**
+     * Only return the HTTP auth scheme token. Example: Authorization {Scheme} TOKEN
+     * @return auth scheme token
+     */
     public String getAuthToken() {
         try {
             return switch (clientAuthType) {
@@ -47,6 +51,10 @@ public class ClientAuthentication {
         }
     }
 
+    /**
+     * Return the full value for the HTTP Authorization header. e.g Basic TOKEN
+     * @return full HTTP AUthorization header value
+     */
     public String getHttpAuthorizationHeaderValue() {
         return switch (clientAuthType) {
             case OIDC -> "Bearer " + getAuthToken();

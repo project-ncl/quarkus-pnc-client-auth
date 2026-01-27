@@ -24,11 +24,13 @@ Add this to your project's `pom.xml`:
 @ApplicationScoped
 public class Yummy {
     @Inject
-    ClientAuthentication clientAuthentication;
+    PNCClientAuth clientAuth;
 
     ...
     public void method() {
-        String authHeaderValue = clientAuthentication.getHttpAuthorizationHeaderValue();
+        String authHeaderValue = clientAuth.getHttpAuthorizationHeaderValue();
+        // if you only want the token
+        String authToken = clientAuth.getAuthToken();
         ...
     }
 }
