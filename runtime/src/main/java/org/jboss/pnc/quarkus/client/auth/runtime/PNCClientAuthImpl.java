@@ -33,7 +33,7 @@ public class PNCClientAuthImpl implements PNCClientAuth {
     /**
      * The path must be a file with format: username:password
      */
-    @ConfigProperty(name = "client_auth.ldap_credentials.path")
+    @ConfigProperty(name = "client_auth.ldap_credentials.path", defaultValue = "")
     String ldapCredentialsPath;
 
     @Override
@@ -41,7 +41,12 @@ public class PNCClientAuthImpl implements PNCClientAuth {
         try {
             return switch (clientAuthType) {
                 case OIDC -> tokens.getAccessToken();
-                case LDAP -> Base64.getEncoder().encodeToString(Files.readString(Path.of(ldapCredentialsPath)).strip().getBytes(StandardCharsets.UTF_8));
+                case LDAP -> {
+                    if (ldapCredentialsPath.isBlank()) {
+                        throw new RuntimeException("client_auth.ldap_credentials.path is empty!");
+                    }
+                    yield Base64.getEncoder().encodeToString(Files.readString(Path.of(ldapCredentialsPath)).strip().getBytes(StandardCharsets.UTF_8));
+                }
             };
         } catch (IOException e) {
             throw new RuntimeException(e);
