@@ -40,7 +40,7 @@ public class Yummy {
 
 In your application.yaml:
 ```yaml
-client_auth:
+pnc_client_auth:
     type: OIDC # or LDAP
     ldap_credentials:
         path: /mnt/secrets/ldap_credentials # file must be in format: <username>:<password>

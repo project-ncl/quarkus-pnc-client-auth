@@ -28,13 +28,13 @@ public class PNCClientAuthImpl implements PNCClientAuth {
     @Inject
     Tokens tokens;
 
-    @ConfigProperty(name = "client_auth.type", defaultValue = "OIDC")
+    @ConfigProperty(name = "pnc_client_auth.type", defaultValue = "OIDC")
     ClientAuthType clientAuthType;
 
     /**
      * The path must be a file with format: username:password
      */
-    @ConfigProperty(name = "client_auth.ldap_credentials.path")
+    @ConfigProperty(name = "pnc_client_auth.ldap_credentials.path")
     Optional<String> ldapCredentialsPath;
 
     @Override
