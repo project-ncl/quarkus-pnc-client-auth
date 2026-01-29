@@ -24,13 +24,6 @@ import java.util.Optional;
 @ApplicationScoped
 public class PNCClientAuthImpl implements PNCClientAuth {
 
-    /**
-     * The current client authentication schemes supported
-     */
-    public static enum ClientAuthType {
-        OIDC, LDAP
-    }
-
     @Inject
     OidcClient oidcClient;
 

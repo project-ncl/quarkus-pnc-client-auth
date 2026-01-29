@@ -10,6 +10,13 @@ package org.jboss.pnc.quarkus.client.auth.runtime;
 public interface PNCClientAuth {
 
     /**
+     * The current client authentication schemes supported
+     */
+    public static enum ClientAuthType {
+        OIDC, LDAP
+    }
+
+    /**
      * Only return the HTTP auth scheme token. Example: Authorization {Scheme} TOKEN
      * 
      * @return auth scheme token
