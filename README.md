@@ -64,6 +64,7 @@ If you use `PNCClientAuth.getHttpAuthorizationHeaderValueWithCachedToken`, it is
 You can mock `PNCClientAuth` in your Quarkus app for testing:
 ```java
 @Mock
+@ApplicationScoped
 public class PNCClientAuthMock implements PNCClientAuth {
     @Override
     public String getAuthToken() {
@@ -74,5 +75,31 @@ public class PNCClientAuthMock implements PNCClientAuth {
     public String getHttpAuthorizationHeaderValue() {
         return "Bearer 1234";
     }
+
+    @Override
+    public String getHttpAuthorizationHeaderValueWithCachedToken() {
+        return getHttpAuthorizationHeaderValue();
+    }
+
+    @Override
+    public LDAPCredentials getLDAPCredentials() throws IOException {
+        return new LDAPCredentials("user", "password");
+    }
 }
 ```
+
+and add in your `application.properties`:
+```
+%test.quarkus.arc.exclude-types=org.jboss.pnc.quarkus.client.auth.runtime.PNCClientAuthImpl
+```
+
+or in your `application.yaml`:
+```yaml
+%test:
+    quarkus:
+        arc:
+            exclude-types: org.jboss.pnc.quarkus.client.auth.runtime.PNCClientAuthImpl
+```
+
+This is required so that the implementation is never loaded and your mock is
+considered as the default implementation.
