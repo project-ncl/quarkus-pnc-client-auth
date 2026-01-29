@@ -48,7 +48,7 @@ pnc_client_auth:
 # We also need to configure the oidc-client
 # More here: https://quarkus.io/guides/security-openid-connect-client-reference
 quarkus:
-    oidc_client:
+    oidc-client:
         auth-server-url: https://keycloak/auth
         client-id: quarkus_app
         credentials:
@@ -56,5 +56,23 @@ quarkus:
         refresh-token-time-skew: 2m
 ```
 
-It is recommended to set the `refresh-token-time-skew` so that the OIDC access
-token gets refreshed way before they expire.
+If you use `PNCClientAuth.getHttpAuthorizationHeaderValueWithCachedToken`, it is recommended to set the
+`refresh-token-time-skew` configuration so that the OIDC access token gets refreshed way before they expire
+
+## Testing in your app
+
+You can mock `PNCClientAuth` in your Quarkus app for testing:
+```java
+@Mock
+public class PNCClientAuthMock implements PNCClientAuth {
+    @Override
+    public String getAuthToken() {
+        return "1234";
+    }
+
+    @Override
+    public String getHttpAuthorizationHeaderValue() {
+        return "Bearer 1234";
+    }
+}
+```

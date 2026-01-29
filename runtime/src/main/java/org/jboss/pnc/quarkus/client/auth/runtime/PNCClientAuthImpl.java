@@ -1,5 +1,6 @@
 package org.jboss.pnc.quarkus.client.auth.runtime;
 
+import io.quarkus.oidc.client.OidcClient;
 import io.quarkus.oidc.client.Tokens;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -9,6 +10,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Duration;
 import java.util.Base64;
 import java.util.Optional;
 
@@ -21,10 +23,20 @@ import java.util.Optional;
  */
 @ApplicationScoped
 public class PNCClientAuthImpl implements PNCClientAuth {
+
+    /**
+     * The current client authentication schemes supported
+     */
     public static enum ClientAuthType {
         OIDC, LDAP
     }
 
+    @Inject
+    OidcClient oidcClient;
+
+    /**
+     * Used to get cached OIDC token value, rather than getting a fresh one all the time
+     */
     @Inject
     Tokens tokens;
 
@@ -41,7 +53,7 @@ public class PNCClientAuthImpl implements PNCClientAuth {
     public String getAuthToken() {
         try {
             return switch (clientAuthType) {
-                case OIDC -> tokens.getAccessToken();
+                case OIDC -> oidcClient.getTokens().await().atMost(Duration.ofMinutes(5)).getAccessToken();
                 case LDAP -> {
                     if (ldapCredentialsPath.isEmpty()) {
                         throw new RuntimeException("client_auth.ldap_credentials.path is empty!");
@@ -58,6 +70,14 @@ public class PNCClientAuthImpl implements PNCClientAuth {
     public String getHttpAuthorizationHeaderValue() {
         return switch (clientAuthType) {
             case OIDC -> "Bearer " + getAuthToken();
+            case LDAP -> "Basic " + getAuthToken();
+        };
+    }
+
+    @Override
+    public String getHttpAuthorizationHeaderValueWithCachedToken() {
+        return switch (clientAuthType) {
+            case OIDC -> "Bearer " + tokens.getAccessToken();
             case LDAP -> "Basic " + getAuthToken();
         };
     }

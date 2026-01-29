@@ -19,7 +19,18 @@ public interface PNCClientAuth {
     /**
      * Return the full value for the HTTP Authorization header. e.g Basic TOKEN
      * 
-     * @return full HTTP AUthorization header value
+     * @return full HTTP Authorization header value
      */
     String getHttpAuthorizationHeaderValue();
+
+    /**
+     * Variant of getHttpAuthorizationHeaderValue where the OIDC token is obtained from a cached value. It is guaranteed
+     * to not have expired yet at the time of calling, but you can adjust the freshness of the token by setting:
+     * quarkus.oidc_client.refresh-token-time-skew=3m for example. It is recommended to just use
+     * {@link #getHttpAuthorizationHeaderValue()} instead since the cached one might not be refreshed properly due to
+     * some bugs. The LDAP token is not cached, but it doesn't need to be cached anyways.
+     *
+     * @return full Http Authorization header value
+     */
+    String getHttpAuthorizationHeaderValueWithCachedToken();
 }
