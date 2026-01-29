@@ -1,5 +1,7 @@
 package org.jboss.pnc.quarkus.client.auth.runtime;
 
+import java.io.IOException;
+
 /**
  * Easily select the client authentication type (LDAP, OIDC [default]) that will be used to send authenticated requests
  * to other applications.
@@ -14,6 +16,15 @@ public interface PNCClientAuth {
      */
     public static enum ClientAuthType {
         OIDC, LDAP
+    }
+
+    /**
+     * DTO for the LDAP username and password
+     * 
+     * @param username username
+     * @param password password
+     */
+    public static record LDAPCredentials(String username, String password) {
     }
 
     /**
@@ -40,4 +51,9 @@ public interface PNCClientAuth {
      * @return full Http Authorization header value
      */
     String getHttpAuthorizationHeaderValueWithCachedToken();
+
+    /**
+     * return the LDAP username and password, in case the client wants the values individually
+     */
+    LDAPCredentials getLDAPCredentials() throws IOException;
 }

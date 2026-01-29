@@ -47,12 +47,7 @@ public class PNCClientAuthImpl implements PNCClientAuth {
         try {
             return switch (clientAuthType) {
                 case OIDC -> oidcClient.getTokens().await().atMost(Duration.ofMinutes(5)).getAccessToken();
-                case LDAP -> {
-                    if (ldapCredentialsPath.isEmpty()) {
-                        throw new RuntimeException("client_auth.ldap_credentials.path is empty!");
-                    }
-                    yield Base64.getEncoder().encodeToString(Files.readString(Path.of(ldapCredentialsPath.get())).strip().getBytes(StandardCharsets.UTF_8));
-                }
+                case LDAP -> Base64.getEncoder().encodeToString(getLDAPCredentialsFileContent().getBytes(StandardCharsets.UTF_8));
             };
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -73,5 +68,25 @@ public class PNCClientAuthImpl implements PNCClientAuth {
             case OIDC -> "Bearer " + tokens.getAccessToken();
             case LDAP -> "Basic " + getAuthToken();
         };
+    }
+
+    @Override
+    public LDAPCredentials getLDAPCredentials() throws IOException {
+        String content = getLDAPCredentialsFileContent();
+        String[] valuesSeparated = content.split(":");
+        if (valuesSeparated.length == 2) {
+            return new LDAPCredentials(valuesSeparated[0], valuesSeparated[1]);
+        } else {
+            throw new RuntimeException("LDAP Credentials file is not formatted properly <username>:<password>");
+        }
+    }
+
+    private String getLDAPCredentialsFileContent() throws IOException {
+
+        if (ldapCredentialsPath.isEmpty()) {
+            throw new RuntimeException("client_auth.ldap_credentials.path is empty!");
+        }
+
+        return Files.readString(Path.of(ldapCredentialsPath.get())).strip();
     }
 }
