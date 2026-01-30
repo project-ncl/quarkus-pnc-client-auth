@@ -53,7 +53,7 @@ quarkus:
         client-id: quarkus_app
         credentials:
             secret: secret
-        refresh-token-time-skew: 2m
+        refresh-token-time-skew: 2M
 ```
 
 If you use `PNCClientAuth.getHttpAuthorizationHeaderValueWithCachedToken`, it is recommended to set the
