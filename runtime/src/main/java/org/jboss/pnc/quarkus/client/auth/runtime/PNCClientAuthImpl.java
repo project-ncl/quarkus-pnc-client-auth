@@ -8,10 +8,12 @@ import java.time.Duration;
 import java.util.Base64;
 import java.util.Optional;
 
+import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
 import org.eclipse.microprofile.config.inject.ConfigProperty;
+import org.jboss.logging.Logger;
 
 import io.quarkus.oidc.client.OidcClient;
 import io.quarkus.oidc.client.Tokens;
@@ -25,6 +27,8 @@ import io.quarkus.oidc.client.Tokens;
  */
 @ApplicationScoped
 public class PNCClientAuthImpl implements PNCClientAuth {
+
+    private static final Logger log = Logger.getLogger(PNCClientAuthImpl.class);
 
     @Inject
     OidcClient oidcClient;
@@ -43,6 +47,11 @@ public class PNCClientAuthImpl implements PNCClientAuth {
      */
     @ConfigProperty(name = "pnc_client_auth.ldap_credentials.path")
     Optional<String> ldapCredentialsPath;
+
+    @PostConstruct
+    void init() {
+        log.infof("PNC client authentication mode selected: %s", clientAuthType);
+    }
 
     @Override
     public ClientAuthType getConfiguredType() {
