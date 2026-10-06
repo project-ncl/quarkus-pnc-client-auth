@@ -20,6 +20,14 @@
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.jboss</groupId>
+    <artifactId>jboss-parent</artifactId>
+    <version>54</version>
+    <relativePath/>
+  </parent>
+
   <groupId>org.jboss.pnc</groupId>
   <artifactId>quarkus-pnc-client-auth-parent</artifactId>
   <version>1.0.1-SNAPSHOT</version>
@@ -63,15 +71,9 @@
   </scm>
 
   <properties>
-    <compiler-plugin.version>3.16.0</compiler-plugin.version>
-    <failsafe-plugin.version>3.6.0</failsafe-plugin.version>
     <maven.compiler.release>17</maven.compiler.release>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    <jdk.min.version>17</jdk.min.version>
     <quarkus.version>3.39.4</quarkus.version>
-    <surefire-plugin.version>3.6.0</surefire-plugin.version>
-    <version.javadoc.plugin>3.12.0</version.javadoc.plugin>
-    <version.source.plugin>3.4.0</version.source.plugin>
     <tagSuffix/>
   </properties>
 
@@ -97,7 +99,6 @@
         </plugin>
         <plugin>
           <artifactId>maven-surefire-plugin</artifactId>
-          <version>${surefire-plugin.version}</version>
           <configuration>
             <systemPropertyVariables>
               <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
@@ -108,7 +109,6 @@
         </plugin>
         <plugin>
           <artifactId>maven-failsafe-plugin</artifactId>
-          <version>${failsafe-plugin.version}</version>
           <configuration>
             <systemPropertyVariables>
               <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
@@ -119,7 +119,6 @@
         </plugin>
         <plugin>
           <artifactId>maven-compiler-plugin</artifactId>
-          <version>${compiler-plugin.version}</version>
           <configuration>
             <parameters>true</parameters>
           </configuration>
@@ -134,7 +133,7 @@
           <tagNameFormat>@{project.version}${tagSuffix}</tagNameFormat>
           <autoVersionSubmodules>true</autoVersionSubmodules>
           <useReleaseProfile>false</useReleaseProfile>
-          <releaseProfiles>release</releaseProfiles>
+          <releaseProfiles>central-release</releaseProfiles>
           <goals>deploy</goals>
         </configuration>
       </plugin>
@@ -177,58 +176,4 @@
       </plugin>
     </plugins>
   </build>
-  <profiles>
-    <profile>
-      <id>release</id>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-source-plugin</artifactId>
-            <version>${version.source.plugin}</version>
-            <executions>
-              <execution>
-                <id>attach-sources</id>
-                <goals>
-                  <goal>jar-no-fork</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-javadoc-plugin</artifactId>
-            <version>${version.javadoc.plugin}</version>
-            <executions>
-              <execution>
-                <id>attach-javadocs</id>
-                <goals>
-                  <goal>jar</goal>
-                </goals>
-                <configuration>
-                  <detectOfflineLinks>false</detectOfflineLinks>
-                  <quiet>true</quiet>
-                  <doclint>none</doclint>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-gpg-plugin</artifactId>
-            <version>3.2.8</version>
-            <executions>
-              <execution>
-                <id>sign-artifacts</id>
-                <goals>
-                  <goal>sign</goal>
-                </goals>
-                <phase>verify</phase>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-  </profiles>
 </project>
