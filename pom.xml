@@ -30,7 +30,7 @@
 
   <groupId>org.jboss.pnc</groupId>
   <artifactId>quarkus-pnc-client-auth-parent</artifactId>
-  <version>1.0.1-SNAPSHOT</version>
+  <version>4.0.0</version>
   <packaging>pom</packaging>
   <name>Quarkus Pnc Client Auth - Parent</name>
 
